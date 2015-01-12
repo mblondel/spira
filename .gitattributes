@@ -1,1 +1,2 @@
-/spira/impl/matrix_fact_fast.cpp -diff
+/spira/impl/matrix_fact_fast.c -diff
+/spira/impl/preprocessing_fast.c -diff
