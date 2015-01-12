@@ -1,8 +1,6 @@
 import sys
 import time
 
-from sklearn.externals import joblib
-
 from spira.datasets import load_movielens
 from spira.completion import MatrixFactorization
 
