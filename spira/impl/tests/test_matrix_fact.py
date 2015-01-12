@@ -5,6 +5,7 @@ from spira.completion import MatrixFactorization
 from testing import assert_array_almost_equal
 from testing import assert_almost_equal
 
+
 def test_matrix_fact_cd():
     # Generate some toy data.
     rng = np.random.RandomState(0)
