@@ -3,7 +3,7 @@
 spira
 =====
 
-lightning is a library for recommender systems in Python.
+spira is a library for recommender systems in Python.
 
 
 Author
