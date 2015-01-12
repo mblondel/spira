@@ -1,0 +1,63 @@
+# Author: Mathieu Blondel
+# License: BSD
+
+import numpy as np
+import scipy.sparse as sp
+
+from .matrix_fact_fast import _cd_fit, _predict
+
+
+class MatrixFactorization(object):
+
+    def __init__(self, alpha=1.0, n_components=30, max_iter=10, tol=1e-3,
+                 random_state=None, verbose=0):
+        self.alpha = alpha
+        self.n_components = n_components
+        self.max_iter = max_iter
+        self.tol = tol
+        self.random_state = random_state
+        self.verbose = verbose
+
+    def _init(self, X, rng):
+        n_rows, n_cols = X.shape
+        P = np.zeros((n_rows, self.n_components), order="C")
+        Q = rng.rand(self.n_components, n_cols)
+        Q = np.asfortranarray(Q)
+        return P, Q
+
+    def fit(self, X):
+        X = sp.csr_matrix(X, dtype=np.float64)
+        n_rows, n_cols = X.shape
+        n_data = len(X.data)
+
+        # Initialization.
+        rng = np.random.RandomState(self.random_state)
+        P, Q = self._init(X, rng)
+
+        residuals = np.empty(n_data, dtype=np.float64)
+        n_max = max(n_rows, n_cols)
+        g = np.empty(n_max, dtype=np.float64)
+        h = np.empty(n_max, dtype=np.float64)
+        delta = np.empty(n_max, dtype=np.float64)
+
+        # Model estimation.
+        _cd_fit(X.data, X.indices, X.indptr, P, Q, residuals, g, h, delta,
+                self.n_components, self.alpha, self.max_iter, self.tol,
+                self.verbose)
+
+        self.P_ = P
+        self.Q_ = Q
+
+        return self
+
+    def predict(self, X):
+        X = sp.csr_matrix(X, dtype=np.float64).copy()
+        _predict(X.data, X.indices, X.indptr, self.P_, self.Q_)
+        return X
+
+    def score(self, X):
+        X = sp.csr_matrix(X, dtype=np.float64)
+        out = np.zeros_like(X.data)
+        _predict(out, X.indices, X.indptr, self.P_, self.Q_)
+        mse = np.mean((X.data - out) ** 2)
+        return np.sqrt(mse)
