@@ -12,6 +12,10 @@ def configuration(parent_package='', top_path=None):
                          sources=['matrix_fact_fast.c'],
                          include_dirs=[numpy.get_include()])
 
+    config.add_extension('preprocessing_fast',
+                         sources=['preprocessing_fast.c'],
+                         include_dirs=[numpy.get_include()])
+
     config.add_subpackage('tests')
 
     return config
