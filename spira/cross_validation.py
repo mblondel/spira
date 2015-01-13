@@ -32,6 +32,12 @@ class ShuffleSplit(object):
             yield X_tr, X_te
 
 
+def train_test_split(X, train_size=0.75, random_state=None):
+    cv = ShuffleSplit(n_iter=1, train_size=train_size,
+                      random_state=random_state)
+    return cv.split(X).next()
+
+
 def cross_val_score(estimator, X, cv):
     scores = []
     for X_tr, X_te in cv.split(X):
