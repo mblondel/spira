@@ -8,6 +8,10 @@ def configuration(parent_package='', top_path=None):
 
     config = Configuration('impl', parent_package, top_path)
 
+    config.add_extension('dataset_fast',
+                         sources=['dataset_fast.c'],
+                         include_dirs=[numpy.get_include()])
+
     config.add_extension('matrix_fact_fast',
                          sources=['matrix_fact_fast.c'],
                          include_dirs=[numpy.get_include()])

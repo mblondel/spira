@@ -4,8 +4,8 @@
 import numpy as np
 import scipy.sparse as sp
 
-from .impl.preprocessing_fast import _mean_csr
-from .impl.preprocessing_fast import _std_csr
+from .impl.dataset_fast import _mean_axis1_csr
+from .impl.dataset_fast import _std_axis1_csr
 from .impl.preprocessing_fast import _transform_csr
 from .impl.preprocessing_fast import _inverse_transform_csr
 
@@ -21,8 +21,8 @@ class StandardScaler(object):
         X = sp.csr_matrix(X)
         self.mean_ = np.zeros(X.shape[0])
         self.std_ = np.zeros(X.shape[0])
-        _mean_csr(X.data, X.indices, X.indptr, self.mean_)
-        _std_csr(X.data, X.indices, X.indptr, self.mean_, self.std_)
+        _mean_axis1_csr(X.data, X.indices, X.indptr, self.mean_)
+        _std_axis1_csr(X.data, X.indices, X.indptr, self.mean_, self.std_)
         return self
 
     def _check_data(self, X):

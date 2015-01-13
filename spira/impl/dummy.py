@@ -4,15 +4,21 @@
 import numpy as np
 import scipy.sparse as sp
 
-from .preprocessing_fast import _mean_csr
+from .dataset import mean
 
 
 class Dummy(object):
+    """
+    An estimator which always predict the row-wise (axis=1)
+    or column-wise (axis=0) mean.
+    """
+
+    def __init__(self, axis=1):
+        self.axis = axis
 
     def fit(self, X):
         X = sp.csr_matrix(X)
-        self.mean_ = np.zeros(X.shape[0])
-        _mean_csr(X.data, X.indices, X.indptr, self.mean_)
+        self.mean_ = mean(X, axis=self.axis)
         return self
 
     def predict(self, X):
@@ -21,8 +27,16 @@ class Dummy(object):
         else:
             X = sp.csr_matrix(X)
 
-        n_observed = np.diff(X.indptr)
-        X.data = np.repeat(self.mean_, n_observed)
+        if self.axis == 0:
+            X.data = self.mean_[X.indices]
+
+        elif self.axis == 1:
+            n_observed = np.diff(X.indptr)
+            X.data = np.repeat(self.mean_, n_observed)
+
+        else:
+            raise ValueError("Invalid axis.")
+
         return X
 
     def score(self, X):

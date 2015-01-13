@@ -13,7 +13,7 @@ X = [[3, 0, 0, 1],
 X = np.array(X, dtype=np.float64)
 
 
-def test_dummy():
+def test_dummy_axis1():
     est = Dummy()
     est.fit(X)
     X_predicted = est.predict(X).toarray()
@@ -22,4 +22,16 @@ def test_dummy():
                   [0, 3.5, 3.5, 0],
                   [0, 0, 2, 0],
                   [1, 0, 0, 0]]
+    assert_array_almost_equal(X_predicted, X_expected)
+
+
+def test_dummy_axis0():
+    est = Dummy(axis=0)
+    est.fit(X)
+    X_predicted = est.predict(X).toarray()
+    X_expected = [[2, 0, 0, 1],
+                  [2, 0, 10./3, 0],
+                  [0, 4, 10./3, 0],
+                  [0, 0, 10./3, 0],
+                  [2, 0, 0, 0]]
     assert_array_almost_equal(X_predicted, X_expected)
