@@ -8,17 +8,17 @@ from .dataset_fast import _mean_axis1_csr
 
 def _mean_csr(X, axis, means):
     if axis == 0:
-        _mean_axis0_csr(X.data, X.indices, X.indptr, means)
+        _mean_axis0_csr(X, means)
     else:
-        _mean_axis1_csr(X.data, X.indices, X.indptr, means)
+        _mean_axis1_csr(X, means)
 
 
 def _mean_csc(X, axis, means):
     # CSC is simply the transposed of CSR.
     if axis == 0:
-        _mean_axis1_csr(X.data, X.indices, X.indptr, means)
+        _mean_axis1_csr(X, means)
     else:
-        _mean_axis0_csr(X.data, X.indices, X.indptr, means)
+        _mean_axis0_csr(X, means)
 
 
 def _mean_coo(X, axis, means):
