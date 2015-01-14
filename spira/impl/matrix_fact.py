@@ -5,6 +5,7 @@ import numpy as np
 import scipy.sparse as sp
 
 from .matrix_fact_fast import _cd_fit, _predict
+from ..metrics import rmse
 
 
 class MatrixFactorization(object):
@@ -51,13 +52,12 @@ class MatrixFactorization(object):
         return self
 
     def predict(self, X):
-        X = sp.csr_matrix(X, dtype=np.float64).copy()
-        _predict(X.data, X.indices, X.indptr, self.P_, self.Q_)
-        return X
-
-    def score(self, X):
-        X = sp.csr_matrix(X, dtype=np.float64)
+        X = sp.csr_matrix(X)
         out = np.zeros_like(X.data)
         _predict(out, X.indices, X.indptr, self.P_, self.Q_)
-        mse = np.mean((X.data - out) ** 2)
-        return np.sqrt(mse)
+        return sp.csr_matrix((out, X.indices, X.indptr), shape=X.shape)
+
+    def score(self, X):
+        X = sp.csr_matrix(X)
+        X_pred = self.predict(X)
+        return rmse(X, X_pred)
