@@ -11,11 +11,12 @@ from ..metrics import rmse
 class MatrixFactorization(object):
 
     def __init__(self, alpha=1.0, n_components=30, max_iter=10, tol=1e-3,
-                 random_state=None, verbose=0):
+                 callback=None, random_state=None, verbose=0):
         self.alpha = alpha
         self.n_components = n_components
         self.max_iter = max_iter
         self.tol = tol
+        self.callback = callback
         self.random_state = random_state
         self.verbose = verbose
 
@@ -33,7 +34,7 @@ class MatrixFactorization(object):
 
         # Initialization.
         rng = np.random.RandomState(self.random_state)
-        P, Q = self._init(X, rng)
+        self.P_, self.Q_ = self._init(X, rng)
 
         residuals = np.empty(n_data, dtype=np.float64)
         n_max = max(n_rows, n_cols)
@@ -42,12 +43,9 @@ class MatrixFactorization(object):
         delta = np.empty(n_max, dtype=np.float64)
 
         # Model estimation.
-        _cd_fit(X.data, X.indices, X.indptr, P, Q, residuals, g, h, delta,
-                self.n_components, self.alpha, self.max_iter, self.tol,
-                self.verbose)
-
-        self.P_ = P
-        self.Q_ = Q
+        _cd_fit(self, X.data, X.indices, X.indptr, self.P_, self.Q_, residuals,
+                g, h, delta, self.n_components, self.alpha, self.max_iter,
+                self.tol, self.callback, self.verbose)
 
         return self
 

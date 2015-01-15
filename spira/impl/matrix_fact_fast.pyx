@@ -109,7 +109,8 @@ cdef double _cd(np.ndarray[double, ndim=1] X_data,
     return violation
 
 
-def _cd_fit(np.ndarray[double, ndim=1] X_data,
+def _cd_fit(self,
+            np.ndarray[double, ndim=1] X_data,
             np.ndarray[int, ndim=1] X_indices,
             np.ndarray[int, ndim=1] X_indptr,
             np.ndarray[double, ndim=2, mode='c'] P,
@@ -122,17 +123,20 @@ def _cd_fit(np.ndarray[double, ndim=1] X_data,
             double alpha,
             int max_iter,
             double tol,
+            callback,
             int verbose):
 
     cdef int n, it
     cdef double violation_init = 0
     cdef double violation
+    cdef int has_callback = callback is not None
 
     cdef int n_rows = P.shape[0]
     cdef int n_cols = Q.shape[1]
 
     cdef double* P_ptr = <double*>P.data
     cdef double* Q_ptr = <double*>Q.data
+
 
     # Initialize ratings
     for n in xrange(X_data.shape[0]):
@@ -148,6 +152,9 @@ def _cd_fit(np.ndarray[double, ndim=1] X_data,
         violation += _cd(X_data, X_indices, X_indptr, P_ptr, Q_ptr,
                          residuals, g, h, delta, n_rows, n_cols,
                          n_components, alpha, 1)
+
+        if has_callback:
+            callback(self)
 
         if it == 0:
             violation_init = violation;
