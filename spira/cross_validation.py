@@ -31,6 +31,9 @@ class ShuffleSplit(object):
                                  shape=shape)
             yield X_tr, X_te
 
+    def __len__(self):
+        return self.n_iter
+
 
 def train_test_split(X, train_size=0.75, random_state=None):
     cv = ShuffleSplit(n_iter=1, train_size=train_size,

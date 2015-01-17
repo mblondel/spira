@@ -4,11 +4,14 @@
 import numpy as np
 import scipy.sparse as sp
 
+# FIXME: don't depend on scikit-learn.
+from sklearn.base import BaseEstimator
+
 from .matrix_fact_fast import _cd_fit, _predict
 from ..metrics import rmse
 
 
-class MatrixFactorization(object):
+class MatrixFactorization(BaseEstimator):
 
     def __init__(self, alpha=1.0, n_components=30, max_iter=10, tol=1e-3,
                  callback=None, random_state=None, verbose=0):
