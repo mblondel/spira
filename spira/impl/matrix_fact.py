@@ -3,6 +3,7 @@
 
 import numpy as np
 import scipy.sparse as sp
+from scipy.linalg import solve
 
 # FIXME: don't depend on scikit-learn.
 from sklearn.base import BaseEstimator
@@ -62,3 +63,44 @@ class MatrixFactorization(BaseEstimator):
         X = sp.csr_matrix(X)
         X_pred = self.predict(X)
         return rmse(X, X_pred)
+
+
+class ImplicitMF(BaseEstimator):
+
+    def __init__(self, alpha=1.0, n_components=30, max_iter=10, tol=1e-3,
+                 callback=None, random_state=None, verbose=0):
+        self.alpha = alpha
+        self.n_components = n_components
+        self.max_iter = max_iter
+        self.tol = tol
+        self.callback = callback
+        self.random_state = random_state
+        self.verbose = verbose
+
+    def _init(self, X, rng):
+        n_rows, n_cols = X.shape
+        P = rng.rand(n_rows, self.n_components)
+        Q = np.zeros((self.n_components, n_cols), order="F")
+        return P, Q
+
+    def fit(self, X):
+        X = sp.csr_matrix(X, dtype=np.float64)
+
+        rng = np.random.RandomState(self.random_state)
+        self.P_, self.Q_ = self._init(X, rng)
+
+        for it in xrange(self.max_iter):
+            PX = self.P_.T * X  # sparse dot
+            PP = np.dot(self.P_.T, self.P_)
+            PP.flat[::PP.shape[0] + 1] += self.alpha
+            self.Q_ = solve(PP, PX)
+
+            QX = self.Q_ * X.T  # sparse dot
+            QQ = np.dot(self.Q_, self.Q_.T)
+            QQ.flat[::QQ.shape[0] + 1] += self.alpha
+            self.P_ = solve(QQ, QX).T
+
+            if self.callback is not None:
+                self.callback(self)
+
+        return self
