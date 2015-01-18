@@ -23,8 +23,12 @@ def error(X, P, Q):
     error = np.dot(X.data, X.data)
     XP = X.T * P  # sparse dot
     PP = np.dot(P.T, P)
-    error -= 2 * np.trace(np.dot(XP, Q))
-    error += np.trace(Q.T.dot(PP).dot(Q))
+    QPP = np.dot(Q.T, PP)
+    error -= 2 * np.trace(np.dot(Q, XP))
+    #error -= 2 * np.dot(Q.T.ravel(), XP.ravel())
+    error += np.trace(np.dot(Q, QPP))
+    #error += np.dot(Q.T.ravel(), QPP.ravel())
+    print error
     return error
 
 
@@ -66,7 +70,8 @@ X_tr = X_tr.tocsr()
 X_te = X_te.tocsr()
 
 cb = Callback(X_tr, X_te)
-mf = ImplicitMF(n_components=30, max_iter=50, alpha=0.1, callback=cb)
+mf = ImplicitMF(n_components=30, max_iter=50, alpha=0.1, callback=cb,
+                random_state=0)
 mf.fit(X_tr)
 
 plt.figure()
