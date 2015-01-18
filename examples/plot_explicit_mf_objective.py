@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 from spira.datasets import load_movielens
 from spira.cross_validation import train_test_split
-from spira.completion import MatrixFactorization
+from spira.completion import ExplicitMF
 
 
 def sqnorm(M):
@@ -56,7 +56,7 @@ X_tr = X_tr.tocsr()
 X_te = X_te.tocsr()
 
 cb = Callback(X_tr, X_te)
-mf = MatrixFactorization(n_components=30, max_iter=50, alpha=0.1, verbose=1, callback=cb)
+mf = ExplicitMF(n_components=30, max_iter=50, alpha=0.1, verbose=1, callback=cb)
 mf.fit(X_tr)
 
 plt.figure()

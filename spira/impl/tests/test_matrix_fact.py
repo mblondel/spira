@@ -1,6 +1,6 @@
 import numpy as np
 
-from spira.completion import MatrixFactorization
+from spira.completion import ExplicitMF
 
 from testing import assert_array_almost_equal
 from testing import assert_almost_equal
@@ -13,8 +13,8 @@ def test_matrix_fact_cd():
     V = rng.rand(3, 20)
     X = np.dot(U, V)
 
-    mf = MatrixFactorization(n_components=3, max_iter=10,
-                             alpha=1e-3, random_state=0, verbose=0)
+    mf = ExplicitMF(n_components=3, max_iter=10, alpha=1e-3, random_state=0,
+                    verbose=0)
 
     mf.fit(X)
 

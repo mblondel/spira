@@ -12,7 +12,7 @@ from .matrix_fact_fast import _cd_fit, _predict
 from ..metrics import rmse
 
 
-class MatrixFactorization(BaseEstimator):
+class ExplicitMF(BaseEstimator):
 
     def __init__(self, alpha=1.0, n_components=30, max_iter=10, tol=1e-3,
                  callback=None, random_state=None, verbose=0):

@@ -3,7 +3,7 @@ import scipy.sparse as sp
 
 from spira.cross_validation import cross_val_score
 from spira.cross_validation import ShuffleSplit
-from spira.completion import MatrixFactorization
+from spira.completion import ExplicitMF
 
 from testing import assert_equal
 
@@ -30,7 +30,7 @@ def test_cross_val_score():
     X = np.dot(U, V)
 
     cv = ShuffleSplit(n_iter=10)
-    mf = MatrixFactorization(n_components=3, max_iter=10,
-                             alpha=1e-3, random_state=0, verbose=0)
+    mf = ExplicitMF(n_components=3, max_iter=10, alpha=1e-3, random_state=0,
+                    verbose=0)
     scores = cross_val_score(mf, X, cv)
     assert_equal(len(scores), cv.n_iter)

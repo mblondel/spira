@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from spira.datasets import load_movielens
 from spira.cross_validation import ShuffleSplit
 from spira.cross_validation import cross_val_score
-from spira.completion import MatrixFactorization
+from spira.completion import ExplicitMF
 from spira.completion import Dummy
 
 try:
@@ -26,7 +26,7 @@ mf_scores = []
 cv = ShuffleSplit(n_iter=3, train_size=0.75, random_state=0)
 
 for alpha in alphas:
-    mf = MatrixFactorization(n_components=30, max_iter=10, alpha=alpha)
+    mf = ExplicitMF(n_components=30, max_iter=10, alpha=alpha)
     mf_scores.append(cross_val_score(mf, X, cv))
 
 # Array of size n_alphas x n_folds.
