@@ -4,6 +4,7 @@
 import numpy as np
 import scipy.sparse as sp
 
+from .metrics import rmse, precision, recall, f1_score
 
 class ShuffleSplit(object):
 
@@ -41,9 +42,27 @@ def train_test_split(X, train_size=0.75, random_state=None):
     return cv.split(X).next()
 
 
-def cross_val_score(estimator, X, cv):
+def cross_val_score(estimator, X, cv, metric=None):
     scores = []
     for X_tr, X_te in cv.split(X):
         estimator.fit(X_tr)
-        scores.append(estimator.score(X_te))
+        if metric is None:
+            scores.append(estimator.score(X_te))
+        else:
+            s = []
+            X_pred = estimator.predict(X_te)
+            # FIXME: factorize this in the metric API.
+            for func in metric:
+                if func == "rmse":
+                    s.append(rmse(X_te, X_pred))
+                elif func == "precision":
+                    s.append(precision(X_te, X_pred))
+                elif func == "recall":
+                    s.append(recall(X_te, X_pred))
+                elif func == "f1_score":
+                    s.append(f1_score(X_te, X_pred))
+                else:
+                    raise ValueError("Unknown metric.")
+            scores.append(s)
+
     return np.array(scores)

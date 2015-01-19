@@ -4,6 +4,7 @@ import scipy.sparse as sp
 from spira.cross_validation import cross_val_score
 from spira.cross_validation import ShuffleSplit
 from spira.completion import ExplicitMF
+from spira.completion import ImplicitMF
 
 from testing import assert_equal
 
@@ -34,3 +35,17 @@ def test_cross_val_score():
                     verbose=0)
     scores = cross_val_score(mf, X, cv)
     assert_equal(len(scores), cv.n_iter)
+
+
+def test_cross_val_score_multi():
+    # Generate some toy data.
+    rng = np.random.RandomState(0)
+    U = rng.rand(50, 3)
+    V = rng.rand(3, 20)
+    X = np.dot(U, V)
+    X = (X > X.mean()).astype(np.int32)
+
+    cv = ShuffleSplit(n_iter=10)
+    mf = ImplicitMF(n_components=3, max_iter=10, alpha=1e-3, random_state=0)
+    scores = cross_val_score(mf, X, cv, metric=["precision", "recall"])
+    assert_equal(scores.shape, (cv.n_iter, 2))
