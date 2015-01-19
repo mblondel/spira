@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from spira.datasets import load_movielens
 from spira.cross_validation import train_test_split
 from spira.completion import ImplicitMF
+from spira.metrics import f1_score
 
 
 def sqnorm(M):
@@ -38,6 +39,7 @@ class Callback(object):
         self.X_tr = X_tr
         self.X_te = X_te
         self.obj = []
+        self.f1 = []
         self.times = []
         self.start_time = time.clock()
         self.test_time = 0
@@ -48,6 +50,9 @@ class Callback(object):
         loss = 0.5 * error(self.X_tr, mf.P_, mf.Q_)
         regul = 0.5 * mf.alpha * (sqnorm(mf.P_) + sqnorm(mf.Q_))
         self.obj.append(loss + regul)
+
+        X_pred = mf.predict(self.X_te)
+        self.f1.append(f1_score(self.X_te, X_pred))
 
         self.test_time += time.clock() - test_time
         self.times.append(time.clock() -  self.start_time - self.test_time)
@@ -79,5 +84,11 @@ plt.plot(cb.times, cb.obj)
 plt.xlabel("CPU time")
 plt.xscale("log")
 plt.ylabel("Objective value")
+
+plt.figure()
+plt.plot(cb.times, cb.f1)
+plt.xlabel("CPU time")
+plt.xscale("log")
+plt.ylabel("F1 score")
 
 plt.show()
