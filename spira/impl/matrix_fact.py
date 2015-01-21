@@ -105,9 +105,13 @@ class ImplicitMF(BaseEstimator):
 
         return self
 
-    def predict(self, X):
+    def decision_function(self, X):
         X = sp.csr_matrix(X, dtype=np.float64)
         out = np.zeros_like(X.data)
         _predict(out, X.indices, X.indptr, self.P_, self.Q_)
-        out = (out > 0.5).astype(np.int32)
         return sp.csr_matrix((out, X.indices, X.indptr), shape=X.shape)
+
+    def predict(self, X):
+        X = self.decision_function(X)
+        X.data = (X.data > 0.5).astype(np.int32)
+        return X
