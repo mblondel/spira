@@ -1,3 +1,6 @@
+# Author: Mathieu Blondel
+# License: BSD
+
 import numpy as np
 import scipy.sparse as sp
 
@@ -42,3 +45,21 @@ def f1_score(X_true, X_pred):
     r = recall(X_true, X_pred)
     # Harmonic mean of precision and recall.
     return 2 * p * r / (p + r)
+
+
+def average_precision(X_true, X_score):
+    y_true, y_score = X_true.data, X_score.data
+    unique_y = np.unique(y_true)
+
+    if len(unique_y) > 2:
+        raise ValueError("Only supported for two relevance levels.")
+
+    pos_label = unique_y[1]
+    order = np.argsort(y_score)[::-1]
+    y_sorted = y_true[order]
+    n = len(y_true)
+    n_pos = np.sum(y_true == pos_label)
+    i = np.arange(n)[::-1]
+    s = np.cumsum(y_sorted[i] / (i + 1.0))
+
+    return np.sum(s * y_sorted[i]) / n_pos
